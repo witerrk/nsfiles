@@ -1,9 +1,34 @@
 <!DOCTYPE HTML>
 <html>
-  <head>
+<head>
     <title>nsFiles</title>
-  </head>
-  <body>
-    
-  </body>
+</head>
+<body>
+    <input id="fs" type="file">
+    <h1 id="link"></h1>
+
+    <script>
+        document.getElementById("fs").addEventListener("change", async (e) => {
+            const s = e.target.files[0].stream().pipeThrough(new CompressionStream('gzip'));
+            const r = await new Response(s).arrayBuffer();
+            let b = '';
+            const u = new Uint8Array(r);
+            for (let i = 0; i < u.byteLength; i++) b += String.fromCharCode(u[i]);
+            document.getElementById("link").innerText = window.location.origin + window.location.pathname + '?file=' + encodeURIComponent(btoa(b));
+        });
+
+        if (new URLSearchParams(window.location.search).get('file')) {
+            (async () => {
+                try {
+                    const b = atob(decodeURIComponent(new URLSearchParams(window.location.search).get('file')));
+                    const u = new Uint8Array(b.length);
+                    for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i);
+                    const s = new Blob([u]).stream().pipeThrough(new DecompressionStream('gzip'));
+                    const r = await new Response(s).arrayBuffer();
+                    location.href = URL.createObjectURL(new Blob([r], { type: 'image/png' }));
+                } catch (e) {}
+            })();
+        }
+    </script>
+</body>
 </html>
