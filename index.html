@@ -2,9 +2,6 @@
 <html>
 <head>
     <title>nsFiles</title>
-    <meta property="og:title" content="nsFiles">
-    <meta property="og:type" content="website">
-    <meta name="twitter:card" content="summary_large_image">
 </head>
 <body>
     <input id="fs" type="file">
@@ -20,11 +17,10 @@
             document.getElementById("link").innerText = window.location.origin + window.location.pathname + '?file=' + encodeURIComponent(btoa(b));
         });
 
-        const p = new URLSearchParams(window.location.search).get('file');
-        if (p) {
+        if (new URLSearchParams(window.location.search).get('file')) {
             (async () => {
                 try {
-                    const b = atob(decodeURIComponent(p));
+                    const b = atob(decodeURIComponent(new URLSearchParams(window.location.search).get('file')));
                     const u = new Uint8Array(b.length);
                     for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i);
                     const s = new Blob([u]).stream().pipeThrough(new DecompressionStream('gzip'));
